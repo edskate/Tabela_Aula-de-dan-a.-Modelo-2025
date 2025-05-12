@@ -46,7 +46,7 @@
 
     .btn-pdf {
       display: block;
-      margin: 20px auto 0;
+      margin: 20px auto;
       padding: 10px 20px;
       font-size: 16px;
       background-color: #28a745;
@@ -63,6 +63,29 @@
     #tabela-container {
       background-color: white;
       padding: 10px;
+    }
+
+    #historico {
+      margin-top: 30px;
+      padding: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    #historico h2 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    #lista-historico {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    #lista-historico li {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
     }
   </style>
 </head>
@@ -82,38 +105,43 @@
       </thead>
       <tbody id="alunos">
         <tr>
-          <td>AB.</td>
-          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td>Ab</td>
+          <td><input type="checkbox" onclick="marcarHora(this, 'João')"></td>
           <td class="hora-chegada">--:--:--</td>
         </tr>
         <tr>
           <td>Jose Soles</td>
-          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td><input type="checkbox" onclick="marcarHora(this, 'Maria')"></td>
           <td class="hora-chegada">--:--:--</td>
         </tr>
         <tr>
           <td>Carlos</td>
-          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td><input type="checkbox" onclick="marcarHora(this, 'Carlos')"></td>
           <td class="hora-chegada">--:--:--</td>
         </tr>
-         <tr>
+          <tr>
           <td>Sabrina</td>
-          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td></td>
+          <td><input type="checkbox" onclick="marcarHora(this, 'Carlos')"></td>
           <td class="hora-chegada">--:--:--</td>
         </tr>
-         <tr>
+          <tr>
           <td>Danda</td>
-          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td><input type="checkbox" onclick="marcarHora(this, 'Carlos')"></td>
           <td class="hora-chegada">--:--:--</td>
         </tr>
-         <tr>
+          <tr>
           <td>Nathalie</td>
-          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td><input type="checkbox" onclick="marcarHora(this, 'Carlos')"></td>
           <td class="hora-chegada">--:--:--</td>
         </tr>
-       
       </tbody>
     </table>
+
+    <div id="historico">
+      <h2>📋 Histórico de Presenças</h2>
+      <ul id="lista-historico"></ul>
+    </div>
   </div>
 
   <button class="btn-pdf" onclick="salvarPDF()">Salvar como PDF</button>
@@ -131,17 +159,25 @@
       document.getElementById("clock").textContent = `${horas}:${minutos}:${segundos}`;
     }
 
-    function marcarHora(checkbox) {
+    function marcarHora(checkbox, nomeAluno) {
       const horaChegadaCell = checkbox.parentElement.nextElementSibling;
       if (checkbox.checked) {
         const agora = new Date();
-        const horas = String(agora.getHours()).padStart(2, '0');
-        const minutos = String(agora.getMinutes()).padStart(2, '0');
-        const segundos = String(agora.getSeconds()).padStart(2, '0');
-        horaChegadaCell.textContent = `${horas}:${minutos}:${segundos}`;
+        const hora = agora.toLocaleTimeString('pt-BR');
+        horaChegadaCell.textContent = hora;
+
+        adicionarHistorico(`${nomeAluno} marcou presença às ${hora}`);
       } else {
         horaChegadaCell.textContent = '--:--:--';
+        adicionarHistorico(`${nomeAluno} desmarcou a presença`);
       }
+    }
+
+    function adicionarHistorico(texto) {
+      const lista = document.getElementById("lista-historico");
+      const item = document.createElement("li");
+      item.textContent = texto;
+      lista.prepend(item); // Adiciona no topo
     }
 
     async function salvarPDF() {
@@ -164,6 +200,6 @@
     setInterval(atualizarRelogio, 1000);
     atualizarRelogio();
   </script>
-<a href="index01.html">Pagina 2 Salvo com histórico</a>
+
 </body>
 </html>
