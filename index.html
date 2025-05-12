@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chamada dos Alunos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .clock {
+      font-size: 2em;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .btn-pdf {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-pdf:hover {
+      background-color: #218838;
+    }
+
+    #tabela-container {
+      background-color: white;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Chamada dos Alunos - 09:00</h1>
+  <div class="clock" id="clock">--:--:--</div>
+
+  <div id="tabela-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome do Aluno</th>
+          <th>Presente</th>
+          <th>Hora de Chegada</th>
+        </tr>
+      </thead>
+      <tbody id="alunos">
+        <tr>
+          <td>AB.</td>
+          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td class="hora-chegada">--:--:--</td>
+        </tr>
+        <tr>
+          <td>Jose Soles</td>
+          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td class="hora-chegada">--:--:--</td>
+        </tr>
+        <tr>
+          <td>Carlos</td>
+          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td class="hora-chegada">--:--:--</td>
+        </tr>
+         <tr>
+          <td>Sabrina</td>
+          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td class="hora-chegada">--:--:--</td>
+        </tr>
+         <tr>
+          <td>Danda</td>
+          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td class="hora-chegada">--:--:--</td>
+        </tr>
+         <tr>
+          <td>Nathalie</td>
+          <td><input type="checkbox" onclick="marcarHora(this)"></td>
+          <td class="hora-chegada">--:--:--</td>
+        </tr>
+       
+      </tbody>
+    </table>
+  </div>
+
+  <button class="btn-pdf" onclick="salvarPDF()">Salvar como PDF</button>
+
+  <!-- Bibliotecas jsPDF e html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    function atualizarRelogio() {
+      const agora = new Date();
+      const horas = String(agora.getHours()).padStart(2, '0');
+      const minutos = String(agora.getMinutes()).padStart(2, '0');
+      const segundos = String(agora.getSeconds()).padStart(2, '0');
+      document.getElementById("clock").textContent = `${horas}:${minutos}:${segundos}`;
+    }
+
+    function marcarHora(checkbox) {
+      const horaChegadaCell = checkbox.parentElement.nextElementSibling;
+      if (checkbox.checked) {
+        const agora = new Date();
+        const horas = String(agora.getHours()).padStart(2, '0');
+        const minutos = String(agora.getMinutes()).padStart(2, '0');
+        const segundos = String(agora.getSeconds()).padStart(2, '0');
+        horaChegadaCell.textContent = `${horas}:${minutos}:${segundos}`;
+      } else {
+        horaChegadaCell.textContent = '--:--:--';
+      }
+    }
+
+    async function salvarPDF() {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      const elemento = document.getElementById("tabela-container");
+
+      const canvas = await html2canvas(elemento);
+      const imgData = canvas.toDataURL("image/png");
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight);
+      pdf.save("chamada-alunos.pdf");
+    }
+
+    setInterval(atualizarRelogio, 1000);
+    atualizarRelogio();
+  </script>
+
+</body>
+</html>
